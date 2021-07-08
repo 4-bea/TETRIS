@@ -23,7 +23,7 @@ def show_menu():
 
     
 #запуск
-game_intro()
+show_menu(
 pygame.init()
 pygame.display.set_caption('ТЕТРИС')
 pygame.display.set_icon(pygame.image.load('Доп/Tetris.png'))
