@@ -10,20 +10,9 @@ RES = 750, 940
 FPS = 60
 
 
-def show_menu():
 
-    intro = True
 
-    while intro:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-    pygame.display.update()
-
-    
 #запуск
-show_menu(
 pygame.init()
 pygame.display.set_caption('ТЕТРИС')
 pygame.display.set_icon(pygame.image.load('Доп/Tetris.png'))
@@ -113,6 +102,7 @@ def set_record(record, score):
         f.write(str(rec))
 
 
+#игровой цикл
 while True:
     record = get_record()
     dx, rotate = 0, False
@@ -124,10 +114,11 @@ while True:
     for i in range(lines):
         pygame.time.wait(200)
     
-    #упрвление фигурой на клавиши
+    #управление фигурой на клавиши
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
+
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 dx = -1
@@ -137,6 +128,8 @@ while True:
                 anim_limit = 100
             elif event.key == pygame.K_UP:
                 rotate = True
+            if event.key == pygame.K_ESCAPE:
+                pause()
     
     
     #счетчик x
@@ -223,6 +216,44 @@ while True:
     sc.blit(title_record, (525, 650))
     sc.blit(font.render(record, True, pygame.Color('purple')), (560, 710))
     
+    #ПАУЗА
+    def print_text(message, x, y, font_color = ('Green'), font_type = 'Доп/font.ttf', font_size = 33):
+        font_type = pygame.font.Font(font_type, font_size)
+        text = font_type.render(message, True, font_color)
+        sc.blit(text, (x, y))  
+
+    def pause():
+        paused = True
+        #сохранение информации при нажатии кнопки на паузу
+        sc.blit(title_tetris, (485, 10))
+        sc.blit(title_score, (525, 790))
+        sc.blit(font.render(str(score), True, pygame.Color('white')), (560, 850))
+        sc.blit(title_record, (525, 650))
+        sc.blit(font.render(record, True, pygame.Color('purple')), (560, 710))
+        for i in range(4):
+            figure_rect.x = next_figure[i].x * TILE + 380
+            figure_rect.y = next_figure[i].y * TILE + 300
+            pygame.draw.rect(sc, next_color, figure_rect)
+        
+        #сама пауза
+        while paused:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+            
+            pygame.mixer.music.pause()
+            print_text('Нажмите ENTER, чтобы продолжить', 25, 455)        
+
+            pressed_keys = pygame.key.get_pressed()
+            if pressed_keys[pygame.K_RETURN]:
+                paused = False
+                pygame.mixer.music.unpause()
+            
+            pygame.display.update()
+            clock.tick(15)                 
+
+
     #завершение игры
     for i in range(W):
         if field[0][i]:
@@ -240,3 +271,13 @@ while True:
     pygame.display.flip()
     clock.tick(FPS)
    
+#Цикл игры
+runGame = True #флаг выхода из цикла игры
+
+while runGame:
+    #Отслеживание события: "закрыть окно"
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: runGame = False
+
+#Выход из игры: 
+pygame.quit()
